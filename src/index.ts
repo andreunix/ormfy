@@ -34,6 +34,7 @@ export type * from "./types.js";
 export * from "./errors.js";
 export {
 	DummyDriver,
+	PostgresDialect,
 	Kysely,
 	PostgresAdapter,
 	PostgresIntrospector,

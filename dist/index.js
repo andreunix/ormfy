@@ -5,7 +5,7 @@ import { OrmfyRecordNotFoundError, OrmfyUnsafeMutationError } from "./errors.js"
 import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "./filter.js";
 import { createOrmfyGuard, hasOrmfyFilterConditions } from "./guard.js";
 export * from "./errors.js";
-export { DummyDriver, Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler, sql, } from "kysely";
+export { DummyDriver, PostgresDialect, Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler, sql, } from "kysely";
 export { buildCLI } from "./cli.js";
 export { defineConfig, } from "./config/define-config.js";
 export { DUMMY_DIALECT_CONFIG } from "./config/dummy-dialect-config.js";
