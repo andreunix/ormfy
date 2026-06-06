@@ -32,23 +32,7 @@ type OrmfyCustomOpsInput<DB, TName extends OrmfyTableName<DB>, CustomOps extends
 
 export type * from "./types.js";
 export * from "./errors.js";
-export {
-	DummyDriver,
-	PostgresDialect,
-	Kysely,
-	PostgresAdapter,
-	PostgresIntrospector,
-	PostgresQueryCompiler,
-	sql,
-} from "kysely";
-export type {
-	ColumnType,
-	Generated,
-	Insertable,
-	Selectable,
-	Transaction,
-	Updateable,
-} from "kysely";
+export * from "kysely";
 export { buildCLI, type CLI } from "./cli.js";
 export {
 	type DefineConfigInput,

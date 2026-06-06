@@ -13,13 +13,13 @@ bun add github:andreunix/ormfy
 For a fixed version, use the Git tag:
 
 ```bash
-bun add github:andreunix/ormfy#v0.1.2
+bun add github:andreunix/ormfy#v0.1.3
 ```
 
-Ormfy already includes Kysely, so you can import the query builder and Kysely types from the same package:
+Ormfy reexports Kysely, so you can import Kysely core and dialect classes from the same package:
 
 ```ts
-import { Kysely, ormfy } from "ormfy"
+import { Kysely, PostgresDialect, ormfy } from "ormfy"
 ```
 
 ## CLI
