@@ -13,19 +13,13 @@ bun add github:andreunix/ormfy
 For a fixed version, use the Git tag:
 
 ```bash
-bun add github:andreunix/ormfy#v0.1.0
+bun add github:andreunix/ormfy#v0.1.1
 ```
 
-Install Kysely in the consuming project too:
-
-```bash
-bun add kysely
-```
-
-Ormfy is not published to npm yet, so import it from the GitHub dependency:
+Ormfy already includes Kysely, so you can import the query builder and Kysely types from the same package:
 
 ```ts
-import { ormfy } from "ormfy"
+import { Kysely, ormfy } from "ormfy"
 ```
 
 ## CLI
@@ -52,7 +46,11 @@ bunx ormfy migrate rollback
 bunx ormfy seed make initial_data
 bunx ormfy seed run
 bunx ormfy sql "select 1"
+bunx ormfy db:typegen
+bunx ormfy db:typegen database
 ```
+
+`db:typegen` writes `src/db/types.ts`, `src/db/columns.ts`, and `src/@types/db.d.ts`. Use `migrations` to derive the shape from your migration files, or `database` to introspect the live database.
 
 If your shell does not resolve local package binaries, call the installed bin directly:
 

@@ -3,8 +3,8 @@ import {
 	PostgresAdapter,
 	PostgresIntrospector,
 	PostgresQueryCompiler,
-} from 'kysely'
-import { defineConfig } from 'ormfy'
+	defineConfig,
+} from 'ormfy'
 
 export default defineConfig({
 	// replace me with a real dialect instance OR a dialect name + `dialectConfig` prop.
@@ -15,8 +15,8 @@ export default defineConfig({
 		createDriver() {
 			return new DummyDriver()
 		},
-		createIntrospector(db) {
-			return new PostgresIntrospector(db)
+		createIntrospector(db: unknown) {
+			return new PostgresIntrospector(db as never)
 		},
 		createQueryCompiler() {
 			return new PostgresQueryCompiler()

@@ -1,4 +1,4 @@
-import type { Kysely } from 'kysely'
+import type { Kysely } from 'ormfy'
 
 // replace `any` with your database interface.
 export async function seed(db: Kysely<any>): Promise<void> {

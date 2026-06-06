@@ -1,6 +1,6 @@
 {
   "name": "ormfy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,10 +30,10 @@
   },
   "dependencies": {
     "citty": "^0.2.2",
-    "jiti": "^2.7.0"
+    "jiti": "^2.7.0",
+    "kysely": "^0.29.2"
   },
   "peerDependencies": {
-    "kysely": "^0.29.2",
     "kysely-neon": "^2",
     "kysely-postgres-js": "^3",
     "kysely-prisma-postgres": "^0.1"
@@ -52,7 +52,6 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "latest",
-    "kysely": "^0.29.2",
     "kysely-neon": "^2",
     "kysely-postgres-js": "^3",
     "kysely-prisma-postgres": "^0.1",

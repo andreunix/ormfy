@@ -16,6 +16,7 @@ import { LegacyMakeCommand as LegacySeedMakeCommand } from './seed/make.js';
 import { SeedCommand } from './seed/root.js';
 import { LegacyRunCommand } from './seed/run.js';
 import { SqlCommand } from './sql.js';
+import { DbTypegenCommand } from './db-typegen.js';
 export const RootCommand = defineCommand(CommonArgs, {
     meta: {
         name: 'ormfy',
@@ -31,6 +32,7 @@ export const RootCommand = defineCommand(CommonArgs, {
         ...LegacyRunCommand,
         ...LegacySeedMakeCommand,
         ...LegacyUpCommand,
+        ...DbTypegenCommand,
         ...MigrateCommand,
         ...SeedCommand,
         ...SqlCommand,

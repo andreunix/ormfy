@@ -16,11 +16,12 @@ import { LegacyMakeCommand as LegacySeedMakeCommand } from './seed/make.js'
 import { SeedCommand } from './seed/root.js'
 import { LegacyRunCommand } from './seed/run.js'
 import { SqlCommand } from './sql.js'
+import { DbTypegenCommand } from './db-typegen.js'
 
 export const RootCommand = defineCommand(CommonArgs, {
-		meta: {
-			name: 'ormfy',
-			description: 'Ormfy command-line tools for Kysely migrations, seeds and SQL',
+	meta: {
+		name: 'ormfy',
+		description: 'Ormfy command-line tools for Kysely migrations, seeds and SQL',
 	},
 	subCommands: {
 		...InitCommand,
@@ -32,6 +33,7 @@ export const RootCommand = defineCommand(CommonArgs, {
 		...LegacyRunCommand,
 		...LegacySeedMakeCommand,
 		...LegacyUpCommand,
+		...DbTypegenCommand,
 		...MigrateCommand,
 		...SeedCommand,
 		...SqlCommand,
@@ -54,6 +56,6 @@ export const RootCommand = defineCommand(CommonArgs, {
 			consola.debug('Failed to print upgrade notice:', error)
 		}
 
-			consola.debug(`finished running from "${fileURLToPath(import.meta.url)}"`)
-		},
-	})
+		consola.debug(`finished running from "${fileURLToPath(import.meta.url)}"`)
+	},
+})

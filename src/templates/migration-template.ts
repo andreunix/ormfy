@@ -1,4 +1,4 @@
-import type { Kysely } from 'kysely'
+import type { Kysely } from 'ormfy'
 
 // Use `never` by default so migrations define SQL explicitly or opt into a snapshot DB type.
 export async function up(db: Kysely<never>): Promise<void> {
