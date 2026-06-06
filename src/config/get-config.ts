@@ -59,6 +59,14 @@ export async function getConfig(
 		args,
 		configMetadata: { configFile },
 		cwd: configPath,
+		models: {
+			...config.models,
+			modelsFolder: resolveCollectionFolderPath(
+				configPath,
+				config.models?.modelsFolder,
+				'src/db/models',
+			),
+		},
 		migrations: {
 			getMigrationPrefix: getMillisPrefix,
 			...config.migrations,

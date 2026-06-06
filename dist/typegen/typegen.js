@@ -150,7 +150,7 @@ async function getTablesFromMigrations(config) {
     }
     return tables;
 }
-async function getTablesFromDatabase(config) {
+export async function getTablesFromDatabase(config) {
     return await usingKysely(config, async (kysely) => {
         const tables = new Map();
         const introspection = kysely.introspection;

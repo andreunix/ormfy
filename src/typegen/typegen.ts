@@ -7,14 +7,14 @@ import type { ResolvedOrmfyConfig } from '../config/ormfy-config.js'
 
 export type TypegenSource = 'migrations' | 'database'
 
-type ColumnInfo = {
+export type ColumnInfo = {
 	generated: boolean
 	name: string
 	nullable: boolean
 	tsType: string
 }
 
-type TableInfo = {
+export type TableInfo = {
 	columns: Map<string, ColumnInfo>
 	name: string
 }
@@ -206,7 +206,7 @@ async function getTablesFromMigrations(
 	return tables
 }
 
-async function getTablesFromDatabase(
+export async function getTablesFromDatabase(
 	config: ResolvedOrmfyConfig,
 ): Promise<Map<string, TableInfo>> {
 	return await usingKysely(config, async (kysely) => {

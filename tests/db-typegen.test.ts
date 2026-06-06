@@ -94,6 +94,9 @@ async function createTempProject() {
     cwd,
     destroyOnExit: false,
     dialect: "pg",
+    models: {
+      modelsFolder: join(cwd, "src/db/models"),
+    },
     migrations: {
       getMigrationPrefix: () => "migration",
       migrationFolder: migrationsFolder,

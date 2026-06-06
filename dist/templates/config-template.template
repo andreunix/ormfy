@@ -22,6 +22,9 @@ export default defineConfig({
 			return new PostgresQueryCompiler()
 		},
 	},
+	// models: {
+	//   modelsFolder: "src/db/models",
+	// },
 	//   migrations: {
 	//     migrationFolder: "migrations",
 	//   },

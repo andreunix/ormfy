@@ -26,6 +26,12 @@ interface KyselyDialectConfigDictionary {
 export type KyselyDialectConfig<Dialect extends KyselyDialect> = Dialect extends ResolvableKyselyDialect ? KyselyDialectConfigDictionary[Dialect] : never;
 export type OrmfyConfig<Dialect extends KyselyDialect = KyselyDialect> = {
     destroyOnExit?: boolean;
+    /**
+     * Pasta onde o comando `gen:models` escreve os arquivos por tabela.
+     *
+     * Padrao: `src/db/models`
+     */
+    models?: ModelsBaseConfig;
     migrations?: MigratorlessMigrationsConfig | MigratorfulMigrationsConfig;
     seeds?: SeederlessSeedsConfig | SeederfulSeedsConfig;
 } & (Dialect extends ResolvableKyselyDialect ? {
@@ -81,6 +87,9 @@ export interface ResolvedOrmfyConfig {
     dialect?: KyselyDialect;
     dialectConfig?: OrFactory<KyselyDialectConfig<ResolvableKyselyDialect>>;
     kysely?: OrFactory<Kysely<any>>;
+    models: SetRequired<ModelsBaseConfig, 'modelsFolder'> & {
+        modelsFolder: string;
+    };
     migrations: SetRequired<MigrationsBaseConfig, 'getMigrationPrefix'> & {
         migrationFolder: string;
         migrator?: Factory<Migrator, [db: Kysely<any>]>;
@@ -98,6 +107,14 @@ export interface ResolvedOrmfyConfigWithKyselyInstance extends Omit<ResolvedOrmf
 }
 export type MigrationsBaseConfig = Omit<MigratorProps, 'db' | 'provider'> & {
     getMigrationPrefix?(): string | Promise<string>;
+};
+/**
+ * Configuracao do gerador de models.
+ *
+ * O caminho e resolvido a partir da raiz do projeto.
+ */
+export type ModelsBaseConfig = {
+    modelsFolder?: string;
 };
 export type SeedsBaseConfig = Omit<SeederProps, 'db' | 'provider'> & {
     getSeedPrefix?(): string | Promise<string>;
