@@ -59,13 +59,18 @@ export async function getConfig(
 		args,
 		configMetadata: { configFile },
 		cwd: configPath,
-		models: {
-			...config.models,
-			modelsFolder: resolveCollectionFolderPath(
-				configPath,
-				config.models?.modelsFolder,
-				'src/db/models',
-			),
+			models: {
+				...config.models,
+				modelsFolder: resolveCollectionFolderPath(
+					configPath,
+					config.models?.modelsFolder,
+					'src/db/models',
+				),
+				dbImportPath: config.models?.dbImportPath ?? '..',
+			},
+		typegen: {
+			source: config.typegen?.source ?? 'migrations',
+			...config.typegen,
 		},
 		migrations: {
 			getMigrationPrefix: getMillisPrefix,

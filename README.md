@@ -13,7 +13,7 @@ bun add github:andreunix/ormfy
 For a fixed version, use the Git tag:
 
 ```bash
-bun add github:andreunix/ormfy#v0.1.5
+bun add github:andreunix/ormfy#v0.1.6
 ```
 
 Ormfy reexports Kysely, so you can import Kysely core and dialect classes from the same package:
@@ -46,13 +46,13 @@ bunx ormfy migrate rollback
 bunx ormfy seed make initial_data
 bunx ormfy seed run
 bunx ormfy sql "select 1"
-bunx ormfy db:typegen
-bunx ormfy db:typegen database
+bunx ormfy gen:types
+bunx ormfy gen:types database
 bunx ormfy gen:models
 ```
 
-`db:typegen` writes `src/db/types.ts`, `src/db/columns.ts`, and `src/@types/db.d.ts`. Use `migrations` to derive the shape from your migration files, or `database` to introspect the live database.
-`gen:models` reads the live database schema and writes one file per table under `src/db/models` by default. Set `models.modelsFolder` in `ormfy.config.ts` to change the output directory.
+`gen:types` writes `src/db/types.ts` and `src/@types/db.d.ts`. It defaults to `migrations`, and you can switch to `database` in the config or by passing `database` on the command line.
+`gen:models` reads the live database schema and writes one file per table under `src/db/models` by default. The generated model is self-contained, with `columns` and `guarded` inline in the file. Set `models.modelsFolder` and `models.dbImportPath` in `ormfy.config.ts` to change the output directory and the db import path.
 
 If your shell does not resolve local package binaries, call the installed bin directly:
 
@@ -77,11 +77,10 @@ Generated model files follow this pattern:
 ```ts
 import { ormfy } from "ormfy"
 import { db } from ".."
-import { databaseColumns, defaultOrmfyGuardedColumns } from "../columns"
 
 export const testTable = ormfy(db, "test_table", {
-  columns: databaseColumns.test_table,
-  guarded: defaultOrmfyGuardedColumns,
+  columns: ["id", "name", "created_at", "updated_at"],
+  guarded: ["id", "created_at", "updated_at"],
   primaryKey: "id",
   idStrategy: "uuidv4",
 })

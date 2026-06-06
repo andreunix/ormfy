@@ -45,7 +45,7 @@ export type OrmfyIdStrategy = "database" | "manual" | "uuidv7" | "uuidv4" | (() 
  * @example
  * ```ts
  * ormfy(db, "users", {
- *   columns: databaseColumns.users,
+ *   columns: ["id", "name", "created_at"],
  *   guarded: ["id", "created_at", "updated_at"],
  *   idStrategy: "uuidv4",
  *   primaryKey: "id",

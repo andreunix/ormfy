@@ -24,6 +24,11 @@ export default defineConfig({
 	},
 	// models: {
 	//   modelsFolder: "src/db/models",
+	//   dbImportPath: "..",
+	//   // os arquivos gerados trazem columns e guarded inline no proprio model
+	// },
+	// typegen: {
+	//   source: "migrations",
 	// },
 	//   migrations: {
 	//     migrationFolder: "migrations",

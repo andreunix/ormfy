@@ -57,6 +57,10 @@ describe("gen models", () => {
       dialect: "pg",
       models: {
         modelsFolder: join(cwd, "src/db/models"),
+        dbImportPath: "..",
+      },
+      typegen: {
+        source: "migrations",
       },
       migrations: {
         getMigrationPrefix: () => "migration",
@@ -76,9 +80,44 @@ describe("gen models", () => {
 
     expect(content).toContain('import { ormfy } from "ormfy";')
     expect(content).toContain('import { db } from "..";')
-    expect(content).toContain('import { databaseColumns, defaultOrmfyGuardedColumns } from "../columns";')
     expect(content).toContain('export const testTable = ormfy(db, "test_table", {')
-    expect(content).toContain('columns: databaseColumns.test_table,')
+    expect(content).toContain('\tcolumns: [\n\t\t"id",\n\t\t"name",\n\t\t"created_at",\n\t] as const,')
+    expect(content).toContain('\tguarded: [\n\t\t"id",\n\t\t"created_at",\n\t] as const,')
     expect(content).toContain('idStrategy: "uuidv4",')
+  })
+
+  test("uses custom db import path", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-paths-"))
+    const config = {
+      args: {} as never,
+      configMetadata: {},
+      cwd,
+      destroyOnExit: false,
+      dialect: "pg",
+      models: {
+        modelsFolder: join(cwd, "src/db/models"),
+        dbImportPath: "../../db",
+      },
+      typegen: {
+        source: "migrations",
+      },
+      migrations: {
+        getMigrationPrefix: () => "migration",
+        migrationFolder: join(cwd, "migrations"),
+      },
+      seeds: {
+        getSeedPrefix: () => "seed",
+        seedFolder: join(cwd, "seeds"),
+      },
+      kysely: createDatabase(),
+    } as ResolvedOrmfyConfig
+
+    await runModelsGen(config)
+
+    const filePath = resolve(cwd, "src/db/models/test_table.ts")
+    const content = await readFile(filePath, "utf8")
+
+    expect(content).toContain('import { db } from "../../db";')
+    expect(content).toContain('\tguarded: [\n\t\t"id",\n\t\t"created_at",\n\t] as const,')
   })
 });

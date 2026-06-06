@@ -83,8 +83,8 @@ export {
  * @example
  * ```ts
  * export const citiesModel = ormfy(db, "cities", {
- *   columns: databaseColumns.cities,
- *   guarded: defaultOrmfyGuardedColumns,
+ *   columns: ["id", "name", "state_code", "created_at"],
+ *   guarded: ["id", "created_at", "updated_at"],
  *   idStrategy: "uuidv4",
  *   primaryKey: "id",
  * })

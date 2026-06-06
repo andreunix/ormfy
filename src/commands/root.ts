@@ -17,7 +17,7 @@ import { SeedCommand } from './seed/root.js'
 import { LegacyRunCommand } from './seed/run.js'
 import { GenModelsCommand } from './gen-models.js'
 import { SqlCommand } from './sql.js'
-import { DbTypegenCommand } from './db-typegen.js'
+import { GenTypesCommand, LegacyDbTypegenCommand } from './gen-types.js'
 
 export const RootCommand = defineCommand(CommonArgs, {
 	meta: {
@@ -35,7 +35,8 @@ export const RootCommand = defineCommand(CommonArgs, {
 		...LegacySeedMakeCommand,
 		...LegacyUpCommand,
 		...GenModelsCommand,
-		...DbTypegenCommand,
+		...GenTypesCommand,
+		...LegacyDbTypegenCommand,
 		...MigrateCommand,
 		...SeedCommand,
 		...SqlCommand,

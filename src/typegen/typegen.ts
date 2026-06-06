@@ -3,9 +3,7 @@ import { dirname, join, resolve } from 'node:path'
 import { consola } from '../utils/logger.js'
 import { safeReaddir } from '../utils/safe-readdir.js'
 import { usingKysely } from '../kysely/using-kysely.js'
-import type { ResolvedOrmfyConfig } from '../config/ormfy-config.js'
-
-export type TypegenSource = 'migrations' | 'database'
+import type { ResolvedOrmfyConfig, TypegenSource } from '../config/ormfy-config.js'
 
 export type ColumnInfo = {
 	generated: boolean
@@ -21,10 +19,9 @@ export type TableInfo = {
 
 const INDENT = '\t'
 const DOUBLE_INDENT = '\t\t'
-const LINE_WIDTH = 150
 const GENERATED_HEADER = [
 	'// Auto-generated. Do not edit manually.',
-	'// Regenerate with: ormfy db:typegen',
+	'// Regenerate with: ormfy gen:types',
 	'',
 ]
 
@@ -80,7 +77,7 @@ const SQL_TO_TS: Record<string, string> = {
 
 export async function runTypegen(
 	config: ResolvedOrmfyConfig,
-	source: TypegenSource,
+	source: TypegenSource = config.typegen.source,
 ): Promise<void> {
 	const tables =
 		source === 'database'
@@ -99,19 +96,15 @@ async function writeArtifacts(
 	tables: Map<string, TableInfo>,
 ): Promise<void> {
 	const typesOutput = generateTypes(tables)
-	const columnsOutput = generateColumns(tables)
 	const dbDeclarationsOutput = generateDbDeclarations(tables)
 
 	const outputFile = resolve(cwd, 'src/db/types.ts')
-	const outputColumnsFile = resolve(cwd, 'src/db/columns.ts')
 	const outputDbDeclarationsFile = resolve(cwd, 'src/@types/db.d.ts')
 
 	await mkdir(dirname(outputFile), { recursive: true })
-	await mkdir(dirname(outputColumnsFile), { recursive: true })
 	await mkdir(dirname(outputDbDeclarationsFile), { recursive: true })
 
 	await writeFile(outputFile, typesOutput, 'utf8')
-	await writeFile(outputColumnsFile, columnsOutput, 'utf8')
 	await writeFile(outputDbDeclarationsFile, dbDeclarationsOutput, 'utf8')
 }
 
@@ -340,42 +333,6 @@ function generateDbDeclarations(tables: Map<string, TableInfo>): string {
 
 	lines.push(`${INDENT}}`)
 	lines.push('}')
-	lines.push('')
-
-	return lines.join('\n')
-}
-
-function generateColumns(tables: Map<string, TableInfo>): string {
-	const lines: string[] = [
-		...GENERATED_HEADER,
-		'import type { Database } from "./types";',
-		'',
-		'type DatabaseColumns = {',
-		`${INDENT}[Table in keyof Database]: readonly (keyof Database[Table] & string)[];`,
-		'};',
-		'',
-		'export const databaseColumns = {',
-	]
-
-	for (const table of tables.values()) {
-		const columnNames = [...table.columns.values()].map((column) => column.name)
-		const inlineColumns = `${INDENT}${table.name}: [${columnNames.map((column) => `"${column}"`).join(', ')}],`
-
-		if (inlineColumns.length <= LINE_WIDTH) {
-			lines.push(inlineColumns)
-			continue
-		}
-
-		lines.push(`${INDENT}${table.name}: [`)
-		for (const column of columnNames) {
-			lines.push(`${DOUBLE_INDENT}"${column}",`)
-		}
-		lines.push(`${INDENT}],`)
-	}
-
-	lines.push('} as const satisfies DatabaseColumns;')
-	lines.push('')
-	lines.push('export const defaultOrmfyGuardedColumns = ["id", "created_at"] as const;')
 	lines.push('')
 
 	return lines.join('\n')

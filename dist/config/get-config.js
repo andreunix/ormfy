@@ -36,6 +36,11 @@ export async function getConfig(args) {
         models: {
             ...config.models,
             modelsFolder: resolveCollectionFolderPath(configPath, config.models?.modelsFolder, 'src/db/models'),
+            dbImportPath: config.models?.dbImportPath ?? '..',
+        },
+        typegen: {
+            source: config.typegen?.source ?? 'migrations',
+            ...config.typegen,
         },
         migrations: {
             getMigrationPrefix: getMillisPrefix,

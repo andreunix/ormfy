@@ -5,10 +5,9 @@ import { safeReaddir } from '../utils/safe-readdir.js';
 import { usingKysely } from '../kysely/using-kysely.js';
 const INDENT = '\t';
 const DOUBLE_INDENT = '\t\t';
-const LINE_WIDTH = 150;
 const GENERATED_HEADER = [
     '// Auto-generated. Do not edit manually.',
-    '// Regenerate with: ormfy db:typegen',
+    '// Regenerate with: ormfy gen:types',
     '',
 ];
 const SQL_TO_TS = {
@@ -60,7 +59,7 @@ const SQL_TO_TS = {
     varbinary: 'Uint8Array',
     varchar: 'string',
 };
-export async function runTypegen(config, source) {
+export async function runTypegen(config, source = config.typegen.source) {
     const tables = source === 'database'
         ? await getTablesFromDatabase(config)
         : await getTablesFromMigrations(config);
@@ -69,16 +68,12 @@ export async function runTypegen(config, source) {
 }
 async function writeArtifacts(cwd, tables) {
     const typesOutput = generateTypes(tables);
-    const columnsOutput = generateColumns(tables);
     const dbDeclarationsOutput = generateDbDeclarations(tables);
     const outputFile = resolve(cwd, 'src/db/types.ts');
-    const outputColumnsFile = resolve(cwd, 'src/db/columns.ts');
     const outputDbDeclarationsFile = resolve(cwd, 'src/@types/db.d.ts');
     await mkdir(dirname(outputFile), { recursive: true });
-    await mkdir(dirname(outputColumnsFile), { recursive: true });
     await mkdir(dirname(outputDbDeclarationsFile), { recursive: true });
     await writeFile(outputFile, typesOutput, 'utf8');
-    await writeFile(outputColumnsFile, columnsOutput, 'utf8');
     await writeFile(outputDbDeclarationsFile, dbDeclarationsOutput, 'utf8');
 }
 async function getTablesFromMigrations(config) {
@@ -248,36 +243,6 @@ function generateDbDeclarations(tables) {
     }
     lines.push(`${INDENT}}`);
     lines.push('}');
-    lines.push('');
-    return lines.join('\n');
-}
-function generateColumns(tables) {
-    const lines = [
-        ...GENERATED_HEADER,
-        'import type { Database } from "./types";',
-        '',
-        'type DatabaseColumns = {',
-        `${INDENT}[Table in keyof Database]: readonly (keyof Database[Table] & string)[];`,
-        '};',
-        '',
-        'export const databaseColumns = {',
-    ];
-    for (const table of tables.values()) {
-        const columnNames = [...table.columns.values()].map((column) => column.name);
-        const inlineColumns = `${INDENT}${table.name}: [${columnNames.map((column) => `"${column}"`).join(', ')}],`;
-        if (inlineColumns.length <= LINE_WIDTH) {
-            lines.push(inlineColumns);
-            continue;
-        }
-        lines.push(`${INDENT}${table.name}: [`);
-        for (const column of columnNames) {
-            lines.push(`${DOUBLE_INDENT}"${column}",`);
-        }
-        lines.push(`${INDENT}],`);
-    }
-    lines.push('} as const satisfies DatabaseColumns;');
-    lines.push('');
-    lines.push('export const defaultOrmfyGuardedColumns = ["id", "created_at"] as const;');
     lines.push('');
     return lines.join('\n');
 }

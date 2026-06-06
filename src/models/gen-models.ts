@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises'
-import { dirname, relative, resolve, sep } from 'node:path'
+import { resolve } from 'node:path'
 import { consola } from '../utils/logger.js'
 import type { ResolvedOrmfyConfig } from '../config/ormfy-config.js'
 import { getTablesFromDatabase, type TableInfo } from '../typegen/typegen.js'
@@ -9,6 +9,7 @@ const GENERATED_HEADER = [
 	'// Regenerate with: ormfy gen:models',
 	'',
 ]
+const DEFAULT_GUARDED_COLUMNS = ['id', 'created_at']
 
 export async function runModelsGen(config: ResolvedOrmfyConfig): Promise<void> {
 	const tables = await getTablesFromDatabase(config)
@@ -18,36 +19,27 @@ export async function runModelsGen(config: ResolvedOrmfyConfig): Promise<void> {
 
 	for (const table of tables.values()) {
 		const filePath = resolve(modelsFolder, `${table.name}.ts`)
-		await writeFile(filePath, renderModelFile(modelsFolder, filePath, table), 'utf8')
+		await writeFile(filePath, renderModelFile(config, table), 'utf8')
 	}
 
 	consola.success(`Generated ${tables.size} model file(s).`)
 }
 
 function renderModelFile(
-	modelsFolder: string,
-	filePath: string,
+	config: ResolvedOrmfyConfig,
 	table: TableInfo,
 ): string {
-	const fileDir = dirname(filePath)
-	const parentDir = dirname(modelsFolder)
-	const dbImportPath = toImportPath(relative(fileDir, parentDir))
-	const columnsImportPath = toImportPath(
-		relative(fileDir, resolve(parentDir, 'columns.ts')),
-	)
 	const exportName = toCamelCase(table.name)
+	const columnNames = [...table.columns.values()].map((column) => column.name)
 
 	return [
 		...GENERATED_HEADER,
 		'import { ormfy } from "ormfy";',
-		`import { db } from "${dbImportPath}";`,
-		'import { databaseColumns, defaultOrmfyGuardedColumns } from "' +
-			columnsImportPath +
-			'";',
+		`import { db } from "${config.models.dbImportPath}";`,
 		'',
 		`export const ${exportName} = ormfy(db, "${table.name}", {`,
-		`\tcolumns: databaseColumns.${table.name},`,
-		'\tguarded: defaultOrmfyGuardedColumns,',
+		`\tcolumns: ${renderReadonlyStringArray(columnNames)},`,
+		`\tguarded: ${renderReadonlyStringArray(DEFAULT_GUARDED_COLUMNS)},`,
 		'\tprimaryKey: "id",',
 		'\tidStrategy: "uuidv4",',
 		'});',
@@ -55,11 +47,14 @@ function renderModelFile(
 	].join('\n')
 }
 
-function toCamelCase(value: string): string {
-	return value.replace(/_([a-z])/g, (_, char: string) => char.toUpperCase())
+function renderReadonlyStringArray(values: readonly string[]): string {
+	if (values.length === 0) {
+		return '[] as const'
+	}
+
+	return `[\n${values.map((value) => `\t\t"${value}",`).join('\n')}\n\t] as const`
 }
 
-function toImportPath(value: string): string {
-	const normalized = value.split(sep).join('/').replace(/\.ts$/, '')
-	return normalized.startsWith('.') ? normalized : `./${normalized}`
+function toCamelCase(value: string): string {
+	return value.replace(/_([a-z])/g, (_, char: string) => char.toUpperCase())
 }

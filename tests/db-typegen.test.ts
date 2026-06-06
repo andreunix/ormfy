@@ -93,9 +93,13 @@ async function createTempProject() {
     configMetadata: {},
     cwd,
     destroyOnExit: false,
-    dialect: "pg",
-    models: {
-      modelsFolder: join(cwd, "src/db/models"),
+      dialect: "pg",
+      models: {
+        modelsFolder: join(cwd, "src/db/models"),
+        dbImportPath: "..",
+      },
+    typegen: {
+      source: "migrations",
     },
     migrations: {
       getMigrationPrefix: () => "migration",
@@ -135,7 +139,6 @@ describe("db typegen", () => {
     await runTypegen(config, "migrations")
 
     const types = await readFile(resolve(cwd, "src/db/types.ts"), "utf8")
-    const columns = await readFile(resolve(cwd, "src/db/columns.ts"), "utf8")
     const declarations = await readFile(resolve(cwd, "src/@types/db.d.ts"), "utf8")
 
     expect(types).toContain('import type { Generated } from "ormfy";')
@@ -143,7 +146,6 @@ describe("db typegen", () => {
     expect(types).toContain("id: Generated<number>;")
     expect(types).toContain("email: string | null;")
     expect(types).toContain("created_at: Generated<Date | null>;")
-    expect(columns).toContain('users: ["id", "email", "created_at", "profile"],')
     expect(declarations).toContain("namespace DB")
     expect(declarations).toContain("export type Users = {")
   })
@@ -186,12 +188,9 @@ describe("db typegen", () => {
     await runTypegen(databaseConfig, "database")
 
     const types = await readFile(resolve(databaseConfig.cwd, "src/db/types.ts"), "utf8")
-    const columns = await readFile(resolve(databaseConfig.cwd, "src/db/columns.ts"), "utf8")
-
     expect(types).toContain("id: Generated<number>;")
     expect(types).toContain("created_at: Generated<Date>;")
     expect(types).toContain("profile: unknown | null;")
     expect(types).not.toContain("users_view")
-    expect(columns).toContain('users: ["id", "email", "created_at", "profile"],')
   })
 });

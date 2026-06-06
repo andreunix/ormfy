@@ -6,6 +6,7 @@ import type { PPGDialectConfig } from 'kysely-prisma-postgres';
 import type { Seeder, SeederProps, SeedProvider } from '../seeds/seeder.js';
 import type { GetConfigArgs } from './get-config.js';
 type SetRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
+export type TypegenSource = 'migrations' | 'database';
 export type KyselyDialect = ResolvableKyselyDialect | KyselyDialectInstance;
 export type ResolvableKyselyDialect = KyselyCoreDialect | KyselyOrganizationDialect;
 export type KyselyCoreDialect = 'pg' | 'mysql2' | 'tedious' | 'better-sqlite3' | 'pglite';
@@ -32,6 +33,12 @@ export type OrmfyConfig<Dialect extends KyselyDialect = KyselyDialect> = {
      * Padrao: `src/db/models`
      */
     models?: ModelsBaseConfig;
+    /**
+     * Configuracao do comando `gen:types`.
+     *
+     * O default e `migrations`, mas pode ser trocado para `database`.
+     */
+    typegen?: TypegenBaseConfig;
     migrations?: MigratorlessMigrationsConfig | MigratorfulMigrationsConfig;
     seeds?: SeederlessSeedsConfig | SeederfulSeedsConfig;
 } & (Dialect extends ResolvableKyselyDialect ? {
@@ -89,6 +96,10 @@ export interface ResolvedOrmfyConfig {
     kysely?: OrFactory<Kysely<any>>;
     models: SetRequired<ModelsBaseConfig, 'modelsFolder'> & {
         modelsFolder: string;
+        dbImportPath: string;
+    };
+    typegen: SetRequired<TypegenBaseConfig, 'source'> & {
+        source: TypegenSource;
     };
     migrations: SetRequired<MigrationsBaseConfig, 'getMigrationPrefix'> & {
         migrationFolder: string;
@@ -115,6 +126,13 @@ export type MigrationsBaseConfig = Omit<MigratorProps, 'db' | 'provider'> & {
  */
 export type ModelsBaseConfig = {
     modelsFolder?: string;
+    dbImportPath?: string;
+};
+/**
+ * Configuracao do gerador de tipos.
+ */
+export type TypegenBaseConfig = {
+    source?: TypegenSource;
 };
 export type SeedsBaseConfig = Omit<SeederProps, 'db' | 'provider'> & {
     getSeedPrefix?(): string | Promise<string>;
