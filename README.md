@@ -13,7 +13,7 @@ bun add github:andreunix/ormfy
 For a fixed version, use the Git tag:
 
 ```bash
-bun add github:andreunix/ormfy#v0.1.3
+bun add github:andreunix/ormfy#v0.1.4
 ```
 
 Ormfy reexports Kysely, so you can import Kysely core and dialect classes from the same package:

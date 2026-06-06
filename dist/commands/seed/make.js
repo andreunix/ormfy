@@ -1,4 +1,4 @@
-import { copyFile, mkdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { consola } from '../../utils/logger.js';
@@ -34,9 +34,9 @@ const Command = defineCommand(args, {
         consola.debug('Filename:', filename);
         const filePath = join(seedFolder, filename);
         consola.debug('File path:', filePath);
-        const templatePath = join(templateRoot, `seed-template.${ORMIFY_EXTENSION}`);
+        const templatePath = join(templateRoot, 'seed-template.template');
         consola.debug('Template path:', templatePath);
-        await copyFile(templatePath, filePath);
+        await writeFile(filePath, await readFile(templatePath, 'utf8'), 'utf8');
         consola.success(`Created seed file at ${filePath}`);
     },
 });
