@@ -32,7 +32,7 @@ export type OrmfyProjection<DB, TName extends OrmfyTableName<DB>, Columns extend
  * Controla como o Ormfy preenche a chave primaria ao criar registros.
  *
  * - `"uuidv7"` gera `Bun.randomUUIDv7()` quando a chave primaria nao vem no input.
- * - `"uuidv4"` gera `Bun.randomUUIDv4()` quando a chave primaria nao vem no input.
+ * - `"uuidv4"` gera `Bun.randomUUIDv4()` quando a chave primaria nao vem no input e e o default do Ormfy.
  * - `"manual"` exige que quem chama informe a chave primaria.
  * - `"database"` deixa a chave primaria para um default do banco.
  * - uma funcao permite usar um gerador de id customizado.
@@ -47,7 +47,7 @@ export type OrmfyIdStrategy = "database" | "manual" | "uuidv7" | "uuidv4" | (() 
  * ormfy(db, "users", {
  *   columns: databaseColumns.users,
  *   guarded: ["id", "created_at", "updated_at"],
- *   idStrategy: "uuidv7",
+ *   idStrategy: "uuidv4",
  *   primaryKey: "id",
  * })
  * ```
@@ -57,7 +57,7 @@ export type OrmfyConfig<DB, TName extends OrmfyTableName<DB>> = {
 	columns: readonly OrmfyColumn<DB, TName>[];
 	/** Colunas que nao podem receber mass assignment via create/update/merge do upsert. */
 	guarded?: readonly OrmfyColumn<DB, TName>[];
-	/** Estrategia de geracao da chave primaria. Padrao: `"uuidv7"`. */
+	/** Estrategia de geracao da chave primaria. Padrao: `"uuidv4"`. */
 	idStrategy?: OrmfyIdStrategy;
 	/** Coluna de chave primaria usada por `findById`, `updateById`, `deleteById`, etc. Padrao: `"id"`. */
 	primaryKey?: OrmfyColumn<DB, TName>;
@@ -240,7 +240,7 @@ export type OrmfyBase<DB, TName extends OrmfyTableName<DB>> = {
 	/**
 	 * Insere um registro e retorna a linha criada.
 	 *
-	 * Com `idStrategy: "uuidv7"`, a chave primaria e gerada automaticamente
+	 * Com `idStrategy: "uuidv4"` ou sem `idStrategy`, a chave primaria e gerada automaticamente
 	 * quando omitida.
 	 */
 	create: <Columns extends readonly OrmfyColumn<DB, TName>[] | undefined = undefined>(

@@ -277,7 +277,7 @@ function generateColumns(tables) {
     }
     lines.push('} as const satisfies DatabaseColumns;');
     lines.push('');
-    lines.push('export const defaultOrmfyGuardedColumns = ["id", "created_at", "updated_at"] as const;');
+    lines.push('export const defaultOrmfyGuardedColumns = ["id", "created_at"] as const;');
     lines.push('');
     return lines.join('\n');
 }

@@ -47,6 +47,20 @@ function createModel() {
   return { driver, model };
 }
 
+function createDefaultIdModel() {
+  const driver = new RecordingDriver();
+  const db = new Kysely<TestDb>({
+    dialect: {
+      createAdapter: () => new PostgresAdapter(),
+      createDriver: () => driver,
+      createIntrospector: (database) => new PostgresIntrospector(database),
+      createQueryCompiler: () => new PostgresQueryCompiler(),
+    },
+  });
+  const model = ormfy(db, "orders", { columns: ["id", "status", "total", "created_at"] });
+  return { driver, model };
+}
+
 describe("Ormfy select/projection", () => {
   test("select returns only requested columns", async () => {
     const { driver, model } = createModel();
@@ -79,5 +93,15 @@ describe("Ormfy select/projection", () => {
   test("invalid select column fails", async () => {
     const { model } = createModel();
     await expect(model.select(["missing" as "id"])).rejects.toThrow(OrmfyInvalidColumnError);
+  });
+
+  test("create uses uuidv4 by default", async () => {
+    const { driver, model } = createDefaultIdModel();
+    driver.rowsQueue.push([{ id: "generated-id", status: "open", total: 10, created_at: new Date(0) }]);
+
+    await model.create({ status: "open", total: 10, created_at: new Date(0) });
+
+    const uuidV4Pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(driver.queries[0]?.parameters.some((value) => typeof value === "string" && uuidV4Pattern.test(value))).toBe(true);
   });
 });

@@ -19,6 +19,8 @@ export { type Seed, Seeder, type SeederProps, type SeedInfo, type SeedProvider, 
  * helpers comuns como `find`, `create`, `updateById`, `paginate`,
  * `firstOrCreate`, `pluck`, `exists` e `lockForUpdate`.
  *
+ * Quando `idStrategy` nao e informado, o default e `"uuidv4"`.
+ *
  * A lista `columns` funciona como allowlist em runtime para filtros, ordenacao,
  * updates e referencias dinamicas de coluna. Use `guarded` para bloquear mass
  * assignment em colunas como `id`, `created_at` e `updated_at`.
@@ -28,7 +30,7 @@ export { type Seed, Seeder, type SeederProps, type SeedInfo, type SeedProvider, 
  * export const citiesModel = ormfy(db, "cities", {
  *   columns: databaseColumns.cities,
  *   guarded: defaultOrmfyGuardedColumns,
- *   idStrategy: "uuidv7",
+ *   idStrategy: "uuidv4",
  *   primaryKey: "id",
  * })
  *
