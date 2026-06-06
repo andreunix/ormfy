@@ -207,11 +207,11 @@ function toPascalCase(value) {
     return value.replace(/(^|_)([a-z])/g, (_, _separator, char) => char.toUpperCase());
 }
 function generateTypes(tables) {
-    const lines = [
-        ...GENERATED_HEADER,
-        'import type { Generated } from "ormfy";',
-        '',
-    ];
+    const shouldImportGenerated = [...tables.values()].some((table) => [...table.columns.values()].some((column) => column.generated));
+    const lines = [...GENERATED_HEADER];
+    if (shouldImportGenerated) {
+        lines.push('import type { Generated } from "ormfy";', '');
+    }
     for (const table of tables.values()) {
         const interfaceName = `${toPascalCase(table.name)}Table`;
         lines.push(`export interface ${interfaceName} {`);

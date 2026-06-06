@@ -285,11 +285,14 @@ function toPascalCase(value: string): string {
 }
 
 function generateTypes(tables: Map<string, TableInfo>): string {
-	const lines: string[] = [
-		...GENERATED_HEADER,
-		'import type { Generated } from "ormfy";',
-		'',
-	]
+	const shouldImportGenerated = [...tables.values()].some((table) =>
+		[...table.columns.values()].some((column) => column.generated),
+	)
+	const lines: string[] = [...GENERATED_HEADER]
+
+	if (shouldImportGenerated) {
+		lines.push('import type { Generated } from "ormfy";', '')
+	}
 
 	for (const table of tables.values()) {
 		const interfaceName = `${toPascalCase(table.name)}Table`
@@ -372,7 +375,7 @@ function generateColumns(tables: Map<string, TableInfo>): string {
 
 	lines.push('} as const satisfies DatabaseColumns;')
 	lines.push('')
-	lines.push('export const defaultOrmfyGuardedColumns = ["id", "created_at", "updated_at"] as const;')
+	lines.push('export const defaultOrmfyGuardedColumns = ["id", "created_at"] as const;')
 	lines.push('')
 
 	return lines.join('\n')

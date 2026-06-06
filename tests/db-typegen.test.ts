@@ -145,6 +145,34 @@ describe("db typegen", () => {
     expect(declarations).toContain("export type Users = {")
   })
 
+  test("omits Generated import when no generated columns are present", async () => {
+    const { config, cwd, migrationsFolder } = await createTempProject()
+
+    await writeFile(
+      join(migrationsFolder, "001_plain.ts"),
+      [
+        'import type { Kysely } from "ormfy"',
+        "",
+        "export async function up(db: Kysely<never>): Promise<void> {",
+        "\tawait db.schema",
+        '\t\t.createTable("logs")',
+        '\t\t.addColumn("id", "integer", (column) => column.primaryKey())',
+        '\t\t.addColumn("message", "text")',
+        "\t\t.execute()",
+        "}",
+      ].join("\n"),
+      "utf8",
+    )
+
+    await runTypegen(config, "migrations")
+
+    const types = await readFile(resolve(cwd, "src/db/types.ts"), "utf8")
+
+    expect(types).not.toContain('import type { Generated } from "ormfy";')
+    expect(types).toContain("id: number;")
+    expect(types).toContain("message: string | null;")
+  })
+
   test("generates files from live database metadata", async () => {
     const { config } = await createTempProject()
     const databaseConfig = {
