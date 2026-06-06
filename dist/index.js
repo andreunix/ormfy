@@ -1,10 +1,10 @@
 //index.ts
 import { randomUUID } from "node:crypto";
 import { sql } from "kysely";
-import { OrmfyRecordNotFoundError, OrmfyUnsafeMutationError } from "./errors.js";
-import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "./filter.js";
-import { createOrmfyGuard, hasOrmfyFilterConditions } from "./guard.js";
-export * from "./errors.js";
+import { OrmfyRecordNotFoundError, OrmfyUnsafeMutationError } from "./ormfy/errors.js";
+import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "./ormfy/filter.js";
+import { createOrmfyGuard, hasOrmfyFilterConditions } from "./ormfy/guard.js";
+export * from "./ormfy/errors.js";
 export * from "kysely";
 export { buildCLI } from "./cli.js";
 export { defineConfig, } from "./config/define-config.js";

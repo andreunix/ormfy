@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { OrmfyGuardedColumnError, OrmfyInvalidColumnError } from "../src/errors";
-import { createOrmfyGuard } from "../src/guard";
+import { OrmfyGuardedColumnError, OrmfyInvalidColumnError } from "../src";
+import { createOrmfyGuard } from "../src/ormfy/guard";
 
 type UserTable = {
   id: string;

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from "kysely";
-import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "../src/filter";
-import type { OrmfyFindFilter } from "../src/types";
+import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "../src/ormfy/filter";
+import type { OrmfyFindFilter } from "../src/ormfy/types";
 
 type UserTable = {
   id: string;

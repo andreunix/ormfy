@@ -1,8 +1,8 @@
 import type { Kysely } from "kysely";
-import type { Ormfy, OrmfyConfig, OrmfyCustomOpsFactory, OrmfyInsert, OrmfyTableName } from "./types.js";
+import type { Ormfy, OrmfyConfig, OrmfyCustomOpsFactory, OrmfyInsert, OrmfyTableName } from "./ormfy/types.js";
 type OrmfyCustomOpsInput<DB, TName extends OrmfyTableName<DB>, CustomOps extends object> = CustomOps | OrmfyCustomOpsFactory<DB, TName, CustomOps>;
-export type * from "./types.js";
-export * from "./errors.js";
+export type * from "./ormfy/types.js";
+export * from "./ormfy/errors.js";
 export * from "kysely";
 export { buildCLI, type CLI } from "./cli.js";
 export { type DefineConfigInput, defineConfig, } from "./config/define-config.js";
