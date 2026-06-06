@@ -4,8 +4,28 @@ Small typed helper over Kysely for CRUD, filters, pagination and transactions.
 
 ## Install
 
+Install directly from GitHub:
+
 ```bash
-bun add ormfy kysely
+bun add github:andreunix/ormfy
+```
+
+For a fixed version, use the Git tag:
+
+```bash
+bun add github:andreunix/ormfy#v0.1.0
+```
+
+Install Kysely in the consuming project too:
+
+```bash
+bun add kysely
+```
+
+Ormfy is not published to npm yet, so import it from the GitHub dependency:
+
+```ts
+import { ormfy } from "ormfy"
 ```
 
 ## CLI
