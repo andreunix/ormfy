@@ -34,7 +34,7 @@ Ormfy includes a Kysely migration/seed/sql CLI for Bun and Node TypeScript proje
 Configuration lives in the project root:
 
 ```bash
-ormfy init
+bunx ormfy init
 ```
 
 This creates:
@@ -46,12 +46,18 @@ ormfy.config.ts
 Common commands:
 
 ```bash
-ormfy migrate make create_users
-ormfy migrate latest
-ormfy migrate rollback
-ormfy seed make initial_data
-ormfy seed run
-ormfy sql "select 1"
+bunx ormfy migrate make create_users
+bunx ormfy migrate latest
+bunx ormfy migrate rollback
+bunx ormfy seed make initial_data
+bunx ormfy seed run
+bunx ormfy sql "select 1"
+```
+
+If your shell does not resolve local package binaries, call the installed bin directly:
+
+```bash
+bun node_modules/.bin/ormfy init
 ```
 
 ## Create A Model

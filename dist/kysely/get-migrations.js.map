@@ -1,0 +1,1 @@
+{"version":3,"file":"get-migrations.js","sourceRoot":"","sources":["../../src/kysely/get-migrations.ts"],"names":[],"mappings":"AAEA,IAAI,UAAoC,CAAA;AAExC,MAAM,CAAC,KAAK,UAAU,aAAa,CAClC,QAAkB;IAElB,OAAO,CAAC,UAAU,KAAK,MAAM,QAAQ,CAAC,aAAa,EAAE,CAAC,CAAA;AACvD,CAAC"}

@@ -1,6 +1,6 @@
 // guard.ts
-import type { OrmfyColumn, OrmfyTableName } from "./types";
-import { OrmfyGuardedColumnError, OrmfyInvalidColumnError } from "./errors";
+import type { OrmfyColumn, OrmfyTableName } from "./types.js";
+import { OrmfyGuardedColumnError, OrmfyInvalidColumnError } from "./errors.js";
 
 const filterOperators = new Set(["$between", "$complex", "$gt", "$gte", "$in", "$lt", "$lte", "$notEqual", "$notIn", "$notNull", "$null", "$search"]);
 

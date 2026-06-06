@@ -2,9 +2,9 @@
 import { randomUUID } from "node:crypto";
 import type { Kysely, Transaction } from "kysely";
 import { sql } from "kysely";
-import { OrmfyRecordNotFoundError, OrmfyUnsafeMutationError } from "./errors";
-import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "./filter";
-import { createOrmfyGuard, hasOrmfyFilterConditions } from "./guard";
+import { OrmfyRecordNotFoundError, OrmfyUnsafeMutationError } from "./errors.js";
+import { applyOrmfyFilter, assertOrmfyNulls, assertOrmfySortDirection, buildOrmfyMergeObject, splitOrmfyUpdate } from "./filter.js";
+import { createOrmfyGuard, hasOrmfyFilterConditions } from "./guard.js";
 import type {
 	Ormfy,
 	OrmfyBase,
@@ -23,15 +23,15 @@ import type {
 	OrmfyTableName,
 	OrmfyTransactionOptions,
 	OrmfyUpdateInput,
-} from "./types";
+} from "./types.js";
 
 type DynamicDb = Kysely<Record<string, Record<string, unknown>>>;
 type OrmfyCustomOpsInput<DB, TName extends OrmfyTableName<DB>, CustomOps extends object> =
 	| CustomOps
 	| OrmfyCustomOpsFactory<DB, TName, CustomOps>;
 
-export type * from "./types";
-export * from "./errors";
+export type * from "./types.js";
+export * from "./errors.js";
 export { buildCLI, type CLI } from "./cli.js";
 export {
 	type DefineConfigInput,

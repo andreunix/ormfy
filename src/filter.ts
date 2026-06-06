@@ -1,7 +1,7 @@
 // filter.ts
 import { sql } from "kysely";
-import { OrmfyInvalidSortError } from "./errors";
-import type { OrmfyFindFilter, OrmfyTableName, OrmfyUpdateInput } from "./types";
+import { OrmfyInvalidSortError } from "./errors.js";
+import type { OrmfyFindFilter, OrmfyTableName, OrmfyUpdateInput } from "./types.js";
 
 export function applyOrmfyFilter<Query, DB, TName extends OrmfyTableName<DB>>(
 	query: Query,

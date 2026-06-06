@@ -1,0 +1,40 @@
+import { consola } from '../utils/logger.js';
+import { assertDefined } from '../utils/assert-defined.js';
+import { exitWithError } from '../utils/error.js';
+import { getMigrations } from './get-migrations.js';
+export async function processMigrationResultSet(resultSet, direction, migrator) {
+    consola.debug(resultSet);
+    let { error, results } = resultSet;
+    if (error) {
+        const failedMigration = results?.find((result) => result.status === 'Error');
+        consola.fail(`Migration failed with \`${error}\`${failedMigration ? ` @ "${failedMigration.migrationName}"` : ''}`);
+        exitWithError(error);
+    }
+    if (!results?.length) {
+        return consola.info(`Migration skipped: no ${direction === 'up' ? 'new' : 'completed'} migrations found`);
+    }
+    consola.success('Migration complete');
+    consola.info(`${direction === 'up' ? 'Ran' : 'Undone'} ${results.length} migration${results.length > 1 ? 's' : ''}:`);
+    if (direction === 'down') {
+        results = [...results].reverse();
+    }
+    const migrations = await getMigrations(migrator);
+    const firstResult = results[0];
+    assertDefined(firstResult);
+    const { migrationName: firstResultMigrationName } = firstResult;
+    const untouchedMigrationsBefore = migrations.slice(0, migrations.findIndex((migration) => migration.name === firstResultMigrationName));
+    const lastResult = results.at(-1);
+    assertDefined(lastResult);
+    const { migrationName: lastResultMigrationName } = lastResult;
+    const untouchedMigrationsAfter = migrations.slice(migrations.findIndex((migration) => migration.name === lastResultMigrationName) + 1);
+    for (const migration of untouchedMigrationsBefore) {
+        consola.log(`[ok] ${migration.name}`);
+    }
+    for (const result of results) {
+        consola.log(`[${result.direction === 'Up' ? 'ok' : 'undo'}] ${result.migrationName}`);
+    }
+    for (const migration of untouchedMigrationsAfter) {
+        consola.log(`[ ] ${migration.name}`);
+    }
+}
+//# sourceMappingURL=process-migration-result-set.js.map

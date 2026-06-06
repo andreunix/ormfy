@@ -1,0 +1,1 @@
+{"version":3,"file":"execute-query.js","sourceRoot":"","sources":["../../src/kysely/execute-query.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAoB,MAAM,QAAQ,CAAA;AAQxD,MAAM,CAAC,KAAK,UAAU,YAAY,CACjC,KAAY,EACZ,MAA6C;IAE7C,OAAO,MAAM,MAAM,CAAC,MAAM,CAAC,YAAY,CACtC,aAAa,CAAC,GAAG,CAAC,KAAK,CAAC,GAAG,EAAE,KAAK,CAAC,UAAU,CAAC,CAC9C,CAAA;AACF,CAAC"}

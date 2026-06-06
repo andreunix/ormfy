@@ -2,17 +2,29 @@
   "name": "ormfy",
   "version": "0.1.0",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
-    "ormfy": "./src/bin.ts"
+    "ormfy": "./dist/bin.js"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./cli": "./src/cli.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    },
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && cp -R src/templates dist/templates",
     "test": "bun test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

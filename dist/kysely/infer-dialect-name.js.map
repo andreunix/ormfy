@@ -1,0 +1,1 @@
+{"version":3,"file":"infer-dialect-name.js","sourceRoot":"","sources":["../../src/kysely/infer-dialect-name.ts"],"names":[],"mappings":"AAEA,MAAM,6BAA6B,GAAG,mBAAmB,CAAA;AAEzD,MAAM,UAAU,gBAAgB,CAAC,MAAuB;IACvD,OAAO,MAAM;SACX,WAAW,EAAE;SACb,OAAO,CAAC,WAAW,CAAC,IAAI,CAAC,UAAU,CAAC,6BAA6B,EAAE,EAAE,CAAC;SACtE,WAAW,EAAE,CAAA;AAChB,CAAC"}
