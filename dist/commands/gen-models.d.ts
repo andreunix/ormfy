@@ -1,5 +1,11 @@
 export declare const GenModelsCommand: {
     readonly "gen:models": Readonly<Omit<import("citty").CommandDef<{
+        readonly source: {
+            readonly description: "Generate models from migrations or the live database.";
+            readonly options: ["migrations", "database"];
+            readonly required: false;
+            readonly type: "enum";
+        };
         readonly 'no-outdated-check': {
             readonly default: false;
             readonly description: "Will not check for latest kysely/ormfy versions and notice newer versions exist.";

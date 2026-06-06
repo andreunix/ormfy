@@ -76,7 +76,7 @@ async function writeArtifacts(cwd, tables) {
     await writeFile(outputFile, typesOutput, 'utf8');
     await writeFile(outputDbDeclarationsFile, dbDeclarationsOutput, 'utf8');
 }
-async function getTablesFromMigrations(config) {
+export async function getTablesFromMigrations(config) {
     const tables = new Map();
     const files = (await safeReaddir(config.migrations.migrationFolder))
         .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'))

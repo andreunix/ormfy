@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { consola } from '../utils/logger.js';
-import { getTablesFromDatabase } from '../typegen/typegen.js';
+import { getTablesFromDatabase, getTablesFromMigrations, } from '../typegen/typegen.js';
 const GENERATED_HEADER = [
     '// Auto-generated. Do not edit manually.',
     '// Regenerate with: ormfy gen:models',
@@ -9,7 +9,9 @@ const GENERATED_HEADER = [
 ];
 const DEFAULT_GUARDED_COLUMNS = ['id', 'created_at'];
 export async function runModelsGen(config) {
-    const tables = await getTablesFromDatabase(config);
+    const tables = config.models.source === 'database'
+        ? await getTablesFromDatabase(config)
+        : await getTablesFromMigrations(config);
     const modelsFolder = config.models.modelsFolder;
     await mkdir(modelsFolder, { recursive: true });
     for (const table of tables.values()) {

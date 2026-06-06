@@ -13,7 +13,7 @@ bun add github:andreunix/ormfy
 For a fixed version, use the Git tag:
 
 ```bash
-bun add github:andreunix/ormfy#v0.1.7
+bun add github:andreunix/ormfy#v0.1.8
 ```
 
 Ormfy reexports Kysely, so you can import Kysely core and dialect classes from the same package:
@@ -52,7 +52,7 @@ bunx ormfy gen:models
 ```
 
 `gen:types` writes `src/db/types.ts` and `src/@types/db.d.ts`. It defaults to `migrations`, and you can switch to `database` in the config or by passing `database` on the command line.
-`gen:models` reads the live database schema and writes one file per table under `src/db/models` by default. The generated model is self-contained, with `columns` and `guarded` inline in the file. Set `models.modelsFolder` and `models.dbImportPath` in `ormfy.config.ts` to change the output directory and the db import path.
+`gen:models` reads migrations by default and can switch to the live database with `database` in the config or on the command line. It writes one file per table under `src/db/models` by default. The generated model is self-contained, with `columns` and `guarded` inline in the file. Set `models.modelsFolder`, `models.dbImportPath`, and `models.source` in `ormfy.config.ts` to change the output directory, db import path, and source.
 
 If your shell does not resolve local package binaries, call the installed bin directly:
 

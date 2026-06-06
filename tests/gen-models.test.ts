@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { Kysely, DummyDriver, PostgresAdapter, PostgresQueryCompiler } from "../src";
@@ -47,8 +47,28 @@ function createDatabase(): Kysely<TestDatabase> {
 }
 
 describe("gen models", () => {
-  test("writes one model file per table", async () => {
+  test("writes one model file per table from migrations by default", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-"))
+    const migrationsFolder = join(cwd, "migrations")
+    await mkdir(migrationsFolder, { recursive: true })
+
+    await writeFile(
+      join(migrationsFolder, "001_init.ts"),
+      [
+        'import { sql, type Kysely } from "ormfy"',
+        "",
+        "export async function up(db: Kysely<never>): Promise<void> {",
+        "\tawait db.schema",
+        '\t\t.createTable("test_table")',
+        '\t\t.addColumn("id", "serial", (column) => column.primaryKey())',
+        '\t\t.addColumn("name", "varchar(255)")',
+        '\t\t.addColumn("created_at", "timestamp with time zone", (column) => column.defaultTo(sql`now()`))',
+        "\t\t.execute()",
+        "}",
+      ].join("\n"),
+      "utf8",
+    )
+
     const config = {
       args: {} as never,
       configMetadata: {},
@@ -58,13 +78,14 @@ describe("gen models", () => {
       models: {
         modelsFolder: join(cwd, "src/db/models"),
         dbImportPath: "..",
+        source: "migrations",
       },
       typegen: {
         source: "migrations",
       },
       migrations: {
         getMigrationPrefix: () => "migration",
-        migrationFolder: join(cwd, "migrations"),
+        migrationFolder: migrationsFolder,
       },
       seeds: {
         getSeedPrefix: () => "seed",
@@ -86,7 +107,7 @@ describe("gen models", () => {
     expect(content).toContain('idStrategy: "uuidv4",')
   })
 
-  test("uses custom db import path", async () => {
+  test("uses custom db import path from database source", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-paths-"))
     const config = {
       args: {} as never,
@@ -97,6 +118,7 @@ describe("gen models", () => {
       models: {
         modelsFolder: join(cwd, "src/db/models"),
         dbImportPath: "../../db",
+        source: "database",
       },
       typegen: {
         source: "migrations",

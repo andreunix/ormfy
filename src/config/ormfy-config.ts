@@ -163,6 +163,7 @@ export interface ResolvedOrmfyConfig {
 	models: SetRequired<ModelsBaseConfig, 'modelsFolder'> & {
 		modelsFolder: string
 		dbImportPath: string
+		source: TypegenSource
 	}
 	typegen: SetRequired<TypegenBaseConfig, 'source'> & {
 		source: TypegenSource
@@ -198,6 +199,12 @@ export type MigrationsBaseConfig = Omit<MigratorProps, 'db' | 'provider'> & {
  * O caminho e resolvido a partir da raiz do projeto.
  */
 export type ModelsBaseConfig = {
+	/**
+	 * Fonte usada pelo `gen:models`.
+	 *
+	 * O default e `migrations`, e pode ser trocado para `database`.
+	 */
+	source?: TypegenSource
 	modelsFolder?: string
 	dbImportPath?: string
 }

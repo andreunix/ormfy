@@ -6,14 +6,27 @@ import { defineCommand } from '../utils/define-command.js';
 import { runModelsGen } from '../models/gen-models.js';
 const args = defineArgs({
     ...CommonArgs,
+    source: {
+        description: 'Generate models from migrations or the live database.',
+        options: ['migrations', 'database'],
+        required: false,
+        type: 'enum',
+    },
 });
 const Command = defineCommand(args, {
     meta: {
-        description: 'Generate one model file per table from the live database',
+        description: 'Generate one model file per table from migrations or the live database',
     },
     async run(context) {
         const config = await getConfigOrFail(context.args);
-        await runModelsGen(config);
+        const source = (context.args.source ?? config.models.source);
+        await runModelsGen({
+            ...config,
+            models: {
+                ...config.models,
+                source,
+            },
+        });
     },
 });
 export const GenModelsCommand = createSubcommand('gen:models', Command);

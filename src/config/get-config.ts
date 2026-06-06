@@ -61,6 +61,7 @@ export async function getConfig(
 		cwd: configPath,
 			models: {
 				...config.models,
+				source: config.models?.source ?? 'migrations',
 				modelsFolder: resolveCollectionFolderPath(
 					configPath,
 					config.models?.modelsFolder,

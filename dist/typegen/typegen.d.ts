@@ -10,4 +10,5 @@ export type TableInfo = {
     name: string;
 };
 export declare function runTypegen(config: ResolvedOrmfyConfig, source?: TypegenSource): Promise<void>;
+export declare function getTablesFromMigrations(config: ResolvedOrmfyConfig): Promise<Map<string, TableInfo>>;
 export declare function getTablesFromDatabase(config: ResolvedOrmfyConfig): Promise<Map<string, TableInfo>>;

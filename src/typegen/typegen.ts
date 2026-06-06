@@ -108,7 +108,7 @@ async function writeArtifacts(
 	await writeFile(outputDbDeclarationsFile, dbDeclarationsOutput, 'utf8')
 }
 
-async function getTablesFromMigrations(
+export async function getTablesFromMigrations(
 	config: ResolvedOrmfyConfig,
 ): Promise<Map<string, TableInfo>> {
 	const tables = new Map<string, TableInfo>()

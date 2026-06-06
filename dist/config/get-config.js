@@ -35,6 +35,7 @@ export async function getConfig(args) {
         cwd: configPath,
         models: {
             ...config.models,
+            source: config.models?.source ?? 'migrations',
             modelsFolder: resolveCollectionFolderPath(configPath, config.models?.modelsFolder, 'src/db/models'),
             dbImportPath: config.models?.dbImportPath ?? '..',
         },

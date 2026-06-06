@@ -94,10 +94,11 @@ async function createTempProject() {
     cwd,
     destroyOnExit: false,
       dialect: "pg",
-      models: {
-        modelsFolder: join(cwd, "src/db/models"),
-        dbImportPath: "..",
-      },
+    models: {
+      modelsFolder: join(cwd, "src/db/models"),
+      dbImportPath: "..",
+      source: "migrations",
+    },
     typegen: {
       source: "migrations",
     },

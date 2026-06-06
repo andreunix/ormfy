@@ -29,4 +29,3 @@ const Command = defineCommand(args, {
 })
 
 export const GenTypesCommand = createSubcommand('gen:types', Command)
-export const LegacyDbTypegenCommand = createSubcommand('db:typegen', Command)
