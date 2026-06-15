@@ -137,6 +137,7 @@ export async function getTablesFromMigrations(config) {
                             block.includes('.generatedByDefaultAsIdentity('),
                         name: columnName,
                         nullable: !block.includes('.notNull()') && !block.includes('.primaryKey()'),
+                        primaryKey: block.includes('.primaryKey()'),
                         tsType: sqlTypeToTs(sqlType),
                     });
                 }
@@ -165,6 +166,7 @@ export async function getTablesFromDatabase(config) {
                     generated: column.isAutoIncrementing || column.hasDefaultValue,
                     name: column.name,
                     nullable: column.isNullable,
+                    primaryKey: column.name === 'id',
                     tsType: sqlTypeToTs(column.dataType),
                 });
             }

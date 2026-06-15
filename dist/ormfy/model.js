@@ -327,7 +327,7 @@ function createOrmfyModel(db, tableName, config, customOps, boundTx) {
         async updateOrCreate(filter, data, options) {
             const existing = await base.findOne(filter, { tx: options?.tx });
             if (existing) {
-                return base.updateById(String(existing[primaryKey]), data, options);
+                return base.updateById(existing[primaryKey], data, options);
             }
             return base.create({ ...filter, ...data }, options);
         },

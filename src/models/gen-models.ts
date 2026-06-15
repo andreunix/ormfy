@@ -40,10 +40,8 @@ function renderModelFile(
 	const exportName = toCamelCase(table.name)
 	const columns = [...table.columns.values()]
 	const columnNames = columns.map((column) => column.name)
-	const primaryKey = columns.find((column) => column.primaryKey) ?? table.columns.get('id')
-	const guardedColumns = [...new Set([primaryKey?.name, ...DEFAULT_GUARDED_COLUMNS])].filter((column): column is string =>
-		Boolean(column && table.columns.has(column)),
-	)
+	const primaryKey = inferPrimaryKey(table)
+	const guardedColumns = getGuardedColumns(table, primaryKey)
 	const idStrategy = primaryKey ? getIdStrategy(primaryKey) : null
 	const configLines = [
 		`\tcolumns: ${renderReadonlyStringArray(columnNames)},`,
@@ -65,6 +63,16 @@ function renderModelFile(
 		'});',
 		'',
 	].join('\n')
+}
+
+function inferPrimaryKey(table: TableInfo): ColumnInfo | undefined {
+	return [...table.columns.values()].find((column) => column.primaryKey) ?? table.columns.get('id')
+}
+
+function getGuardedColumns(table: TableInfo, primaryKey: ColumnInfo | undefined): string[] {
+	return [...new Set([primaryKey?.name, ...DEFAULT_GUARDED_COLUMNS])].filter((column): column is string =>
+		Boolean(column && table.columns.has(column)),
+	)
 }
 
 function getIdStrategy(column: ColumnInfo): 'database' | 'manual' | 'uuidv4' {

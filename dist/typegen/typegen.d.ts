@@ -3,6 +3,7 @@ export type ColumnInfo = {
     generated: boolean;
     name: string;
     nullable: boolean;
+    primaryKey: boolean;
     tsType: string;
 };
 export type TableInfo = {

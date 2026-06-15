@@ -7,7 +7,7 @@ const GENERATED_HEADER = [
     '// Regenerate with: ormfy gen:models',
     '',
 ];
-const DEFAULT_GUARDED_COLUMNS = ['id', 'created_at'];
+const DEFAULT_GUARDED_COLUMNS = ['created_at', 'updated_at'];
 export async function runModelsGen(config) {
     const tables = config.models.source === 'database'
         ? await getTablesFromDatabase(config)
@@ -22,20 +22,44 @@ export async function runModelsGen(config) {
 }
 function renderModelFile(config, table) {
     const exportName = toCamelCase(table.name);
-    const columnNames = [...table.columns.values()].map((column) => column.name);
+    const columns = [...table.columns.values()];
+    const columnNames = columns.map((column) => column.name);
+    const primaryKey = inferPrimaryKey(table);
+    const guardedColumns = getGuardedColumns(table, primaryKey);
+    const idStrategy = primaryKey ? getIdStrategy(primaryKey) : null;
+    const configLines = [
+        `\tcolumns: ${renderReadonlyStringArray(columnNames)},`,
+        `\tguarded: ${renderReadonlyStringArray(guardedColumns)},`,
+    ];
+    if (primaryKey) {
+        configLines.push(`\tprimaryKey: "${primaryKey.name}",`);
+        configLines.push(`\tidStrategy: "${idStrategy}",`);
+    }
     return [
         ...GENERATED_HEADER,
         'import { ormfy } from "ormfy";',
         `import { db } from "${config.models.dbImportPath}";`,
         '',
         `export const ${exportName} = ormfy(db, "${table.name}", {`,
-        `\tcolumns: ${renderReadonlyStringArray(columnNames)},`,
-        `\tguarded: ${renderReadonlyStringArray(DEFAULT_GUARDED_COLUMNS)},`,
-        '\tprimaryKey: "id",',
-        '\tidStrategy: "uuidv4",',
+        ...configLines,
         '});',
         '',
     ].join('\n');
+}
+function inferPrimaryKey(table) {
+    return [...table.columns.values()].find((column) => column.primaryKey) ?? table.columns.get('id');
+}
+function getGuardedColumns(table, primaryKey) {
+    return [...new Set([primaryKey?.name, ...DEFAULT_GUARDED_COLUMNS])].filter((column) => Boolean(column && table.columns.has(column)));
+}
+function getIdStrategy(column) {
+    if (column.generated) {
+        return 'database';
+    }
+    if (column.tsType === 'string') {
+        return 'uuidv4';
+    }
+    return 'manual';
 }
 function renderReadonlyStringArray(values) {
     if (values.length === 0) {
