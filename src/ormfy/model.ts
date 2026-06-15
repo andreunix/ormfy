@@ -18,6 +18,7 @@ import type {
 	OrmfyIdStrategy,
 	OrmfyInsert,
 	OrmfyNumericColumn,
+	OrmfyPrimaryKeyValue,
 	OrmfyRow,
 	OrmfyTableName,
 	OrmfyTransactionOptions,
@@ -495,7 +496,7 @@ function createOrmfyModel<DB, TName extends OrmfyTableName<DB>, CustomOps extend
 			const existing = await base.findOne(filter, { tx: options?.tx });
 
 			if (existing) {
-				return base.updateById(String(existing[primaryKey]), data as OrmfyUpdateInput<DB, TName>, options) as Promise<OrmfyRow<DB, TName>>;
+				return base.updateById(existing[primaryKey] as OrmfyPrimaryKeyValue<DB, TName>, data as OrmfyUpdateInput<DB, TName>, options) as Promise<OrmfyRow<DB, TName>>;
 			}
 
 			return base.create({ ...filter, ...data } as OrmfyCreateInput<DB, TName>, options) as Promise<OrmfyRow<DB, TName>>;
@@ -654,7 +655,7 @@ function updateWhere<DB, TName extends OrmfyTableName<DB>>(
 
 async function updateCounter<DB, TName extends OrmfyTableName<DB>>(
 	base: OrmfyBase<DB, TName>,
-	id: string,
+	id: OrmfyPrimaryKeyValue<DB, TName>,
 	column: OrmfyNumericColumn<DB, TName>,
 	amount: number,
 	operator: "$decr" | "$incr",

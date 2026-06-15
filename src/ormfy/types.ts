@@ -27,6 +27,9 @@ export type OrmfyProjection<DB, TName extends OrmfyTableName<DB>, Columns extend
 	OrmfyRow<DB, TName>,
 	Columns[number]
 >;
+export type OrmfyPrimaryKeyColumn<DB, TName extends OrmfyTableName<DB>> = "id" extends OrmfyColumn<DB, TName> ? "id" : OrmfyColumn<DB, TName>;
+export type OrmfyPrimaryKeyValue<DB, TName extends OrmfyTableName<DB>> = OrmfyRow<DB, TName>[OrmfyPrimaryKeyColumn<DB, TName>];
+export type OrmfyGeneratedId = string | number | bigint;
 
 /**
  * Controla como o Ormfy preenche a chave primaria ao criar registros.
@@ -37,7 +40,7 @@ export type OrmfyProjection<DB, TName extends OrmfyTableName<DB>, Columns extend
  * - `"database"` deixa a chave primaria para um default do banco.
  * - uma funcao permite usar um gerador de id customizado.
  */
-export type OrmfyIdStrategy = "database" | "manual" | "uuidv7" | "uuidv4" | (() => string);
+export type OrmfyIdStrategy = "database" | "manual" | "uuidv7" | "uuidv4" | (() => OrmfyGeneratedId);
 
 /**
  * Configuracao em runtime para um model Ormfy.
@@ -265,7 +268,7 @@ export type OrmfyBase<DB, TName extends OrmfyTableName<DB>> = {
 		options: OrmfyCursorPageOptions<DB, TName>,
 	) => Promise<OrmfyCursorPage<OrmfyRow<DB, TName>>>;
 	/** Decrementa uma coluna numerica por id e retorna o registro atualizado. */
-	decrement: (id: string, column: OrmfyNumericColumn<DB, TName>, amount?: number, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
+	decrement: (id: OrmfyPrimaryKeyValue<DB, TName>, column: OrmfyNumericColumn<DB, TName>, amount?: number, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
 	/**
 	 * Remove registros que batem com o filtro.
 	 *
@@ -277,7 +280,7 @@ export type OrmfyBase<DB, TName extends OrmfyTableName<DB>> = {
 	) => Promise<Array<OrmfyReturningRow<DB, TName, Columns>>>;
 	/** Remove um registro pela chave primaria e retorna o registro removido. */
 	deleteById: <Columns extends readonly OrmfyColumn<DB, TName>[] | undefined = undefined>(
-		id: string,
+		id: OrmfyPrimaryKeyValue<DB, TName>,
 		options?: OrmfyReturningOptions<DB, TName, Columns>,
 	) => Promise<OrmfyReturningRow<DB, TName, Columns>>;
 	/** Retorna true quando nenhum registro bate com o filtro. */
@@ -300,9 +303,9 @@ export type OrmfyBase<DB, TName extends OrmfyTableName<DB>> = {
 		options?: OrmfyFindOptions<DB, TName, TCount>,
 	) => Promise<OrmfyFindReturn<DB, TName, TCount>>;
 	/** Busca um registro pela chave primaria. Retorna undefined quando nao encontrar. */
-	findById: (id: string, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName> | undefined>;
+	findById: (id: OrmfyPrimaryKeyValue<DB, TName>, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName> | undefined>;
 	/** Busca um registro pela chave primaria ou lanca erro quando nao encontrar. */
-	findOrFail: (id: string, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
+	findOrFail: (id: OrmfyPrimaryKeyValue<DB, TName>, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
 	/** Busca o primeiro registro que bate com o filtro. */
 	findOne: (filter: OrmfyFindFilter<DB, TName>, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName> | undefined>;
 	/** Retorna o primeiro registro da tabela. */
@@ -316,7 +319,7 @@ export type OrmfyBase<DB, TName extends OrmfyTableName<DB>> = {
 	/** Busca o primeiro registro que bate com o filtro ou lanca erro. */
 	firstOrFail: (filter: OrmfyFindFilter<DB, TName>, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
 	/** Incrementa uma coluna numerica por id e retorna o registro atualizado. */
-	increment: (id: string, column: OrmfyNumericColumn<DB, TName>, amount?: number, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
+	increment: (id: OrmfyPrimaryKeyValue<DB, TName>, column: OrmfyNumericColumn<DB, TName>, amount?: number, options?: { tx?: OrmfyDb<DB> }) => Promise<OrmfyRow<DB, TName>>;
 	/** Insere varios registros e retorna as linhas criadas. */
 	insertMany: (data: readonly OrmfyCreateInput<DB, TName>[], options?: { tx?: OrmfyDb<DB> }) => Promise<Array<OrmfyRow<DB, TName>>>;
 	/**
@@ -399,7 +402,7 @@ export type OrmfyBase<DB, TName extends OrmfyTableName<DB>> = {
 	) => Promise<Array<OrmfyReturningRow<DB, TName, Columns>>>;
 	/** Atualiza um registro pela chave primaria e retorna o registro atualizado. */
 	updateById: <Columns extends readonly OrmfyColumn<DB, TName>[] | undefined = undefined>(
-		id: string,
+		id: OrmfyPrimaryKeyValue<DB, TName>,
 		data: OrmfyUpdateInput<DB, TName>,
 		options?: OrmfyReturningOptions<DB, TName, Columns>,
 	) => Promise<OrmfyReturningRow<DB, TName, Columns>>;

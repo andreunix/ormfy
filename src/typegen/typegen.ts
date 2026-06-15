@@ -9,6 +9,7 @@ export type ColumnInfo = {
 	generated: boolean
 	name: string
 	nullable: boolean
+	primaryKey: boolean
 	tsType: string
 }
 
@@ -189,6 +190,7 @@ export async function getTablesFromMigrations(
 							block.includes('.generatedByDefaultAsIdentity('),
 						name: columnName,
 						nullable: !block.includes('.notNull()') && !block.includes('.primaryKey()'),
+						primaryKey: block.includes('.primaryKey()'),
 						tsType: sqlTypeToTs(sqlType),
 					})
 				}
@@ -224,6 +226,7 @@ export async function getTablesFromDatabase(
 					generated: column.isAutoIncrementing || column.hasDefaultValue,
 					name: column.name,
 					nullable: column.isNullable,
+					primaryKey: column.name === 'id',
 					tsType: sqlTypeToTs(column.dataType),
 				})
 			}

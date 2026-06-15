@@ -106,7 +106,7 @@ Supported values:
 - `uuidv7`
 - `manual`
 - `database`
-- a custom function returning a string
+- a custom function returning a `string`, `number`, or `bigint`
 
 ## CLI
 
@@ -209,7 +209,12 @@ It reads the migration folder by default. Use `database` when you want the gener
 
 It reads migrations by default, so the generated models are aligned with the schema declared in your migration files. Use `database` when you want to introspect the live database instead.
 
-Generated files are self-contained. They include `columns` and `guarded` inline:
+Generated files are self-contained. They include `columns` and `guarded` inline. `gen:models` infers `primaryKey` and `idStrategy` per table when it can:
+
+- generated primary keys use `idStrategy: "database"`
+- string primary keys without a database default use `idStrategy: "uuidv4"`
+- other primary keys without a database default use `idStrategy: "manual"`
+- tables without a detected primary key omit `primaryKey` and `idStrategy`
 
 ```ts
 import { ormfy } from "ormfy"
@@ -228,7 +233,7 @@ export const testTable = ormfy(db, "test_table", {
     "updated_at",
   ] as const,
   primaryKey: "id",
-  idStrategy: "uuidv4",
+  idStrategy: "database",
 })
 ```
 

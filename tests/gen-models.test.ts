@@ -104,7 +104,7 @@ describe("gen models", () => {
     expect(content).toContain('export const testTable = ormfy(db, "test_table", {')
     expect(content).toContain('\tcolumns: [\n\t\t"id",\n\t\t"name",\n\t\t"created_at",\n\t] as const,')
     expect(content).toContain('\tguarded: [\n\t\t"id",\n\t\t"created_at",\n\t] as const,')
-    expect(content).toContain('idStrategy: "uuidv4",')
+    expect(content).toContain('idStrategy: "database",')
   })
 
   test("uses custom db import path from database source", async () => {
@@ -141,5 +141,115 @@ describe("gen models", () => {
 
     expect(content).toContain('import { db } from "../../db";')
     expect(content).toContain('\tguarded: [\n\t\t"id",\n\t\t"created_at",\n\t] as const,')
+    expect(content).toContain('idStrategy: "database",')
+  })
+
+  test("infers string primary key strategy from migrations", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-string-pk-"))
+    const migrationsFolder = join(cwd, "migrations")
+    await mkdir(migrationsFolder, { recursive: true })
+
+    await writeFile(
+      join(migrationsFolder, "001_init.ts"),
+      [
+        'import { type Kysely } from "ormfy"',
+        "",
+        "export async function up(db: Kysely<never>): Promise<void> {",
+        "\tawait db.schema",
+        '\t\t.createTable("api_keys")',
+        '\t\t.addColumn("key", "varchar(255)", (column) => column.primaryKey())',
+        '\t\t.addColumn("name", "varchar(255)")',
+        "\t\t.execute()",
+        "}",
+      ].join("\n"),
+      "utf8",
+    )
+
+    const config = {
+      args: {} as never,
+      configMetadata: {},
+      cwd,
+      destroyOnExit: false,
+      dialect: "pg",
+      models: {
+        modelsFolder: join(cwd, "src/db/models"),
+        dbImportPath: "..",
+        source: "migrations",
+      },
+      typegen: {
+        source: "migrations",
+      },
+      migrations: {
+        getMigrationPrefix: () => "migration",
+        migrationFolder: migrationsFolder,
+      },
+      seeds: {
+        getSeedPrefix: () => "seed",
+        seedFolder: join(cwd, "seeds"),
+      },
+      kysely: createDatabase(),
+    } as ResolvedOrmfyConfig
+
+    await runModelsGen(config)
+
+    const content = await readFile(resolve(cwd, "src/db/models/api_keys.ts"), "utf8")
+
+    expect(content).toContain('primaryKey: "key",')
+    expect(content).toContain('idStrategy: "uuidv4",')
+  })
+
+  test("does not force id primary key for tables without one", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-no-id-"))
+    const migrationsFolder = join(cwd, "migrations")
+    await mkdir(migrationsFolder, { recursive: true })
+
+    await writeFile(
+      join(migrationsFolder, "001_init.ts"),
+      [
+        'import { type Kysely } from "ormfy"',
+        "",
+        "export async function up(db: Kysely<never>): Promise<void> {",
+        "\tawait db.schema",
+        '\t\t.createTable("logs")',
+        '\t\t.addColumn("message", "text")',
+        '\t\t.addColumn("created_at", "timestamp with time zone")',
+        "\t\t.execute()",
+        "}",
+      ].join("\n"),
+      "utf8",
+    )
+
+    const config = {
+      args: {} as never,
+      configMetadata: {},
+      cwd,
+      destroyOnExit: false,
+      dialect: "pg",
+      models: {
+        modelsFolder: join(cwd, "src/db/models"),
+        dbImportPath: "..",
+        source: "migrations",
+      },
+      typegen: {
+        source: "migrations",
+      },
+      migrations: {
+        getMigrationPrefix: () => "migration",
+        migrationFolder: migrationsFolder,
+      },
+      seeds: {
+        getSeedPrefix: () => "seed",
+        seedFolder: join(cwd, "seeds"),
+      },
+      kysely: createDatabase(),
+    } as ResolvedOrmfyConfig
+
+    await runModelsGen(config)
+
+    const content = await readFile(resolve(cwd, "src/db/models/logs.ts"), "utf8")
+
+    expect(content).not.toContain('primaryKey: "id",')
+    expect(content).not.toContain("idStrategy:")
+    expect(content).toContain('\tguarded: [\n\t\t"created_at",\n\t] as const,')
   })
 });
