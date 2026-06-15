@@ -14,7 +14,7 @@ const GENERATED_HEADER = [
 	'// Regenerate with: ormfy gen:models',
 	'',
 ]
-const DEFAULT_GUARDED_COLUMNS = ['created_at', 'updated_at']
+const DEFAULT_GUARDED_COLUMNS = ['id', 'created_at', 'updated_at']
 
 export async function runModelsGen(config: ResolvedOrmfyConfig): Promise<void> {
 	const tables =

@@ -144,6 +144,61 @@ describe("gen models", () => {
     expect(content).toContain('idStrategy: "database",')
   })
 
+  test("omits missing default guarded columns", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-missing-guarded-"))
+    const migrationsFolder = join(cwd, "migrations")
+    await mkdir(migrationsFolder, { recursive: true })
+
+    await writeFile(
+      join(migrationsFolder, "001_init.ts"),
+      [
+        'import { type Kysely } from "ormfy"',
+        "",
+        "export async function up(db: Kysely<never>): Promise<void> {",
+        "\tawait db.schema",
+        '\t\t.createTable("customers")',
+        '\t\t.addColumn("id", "serial", (column) => column.primaryKey())',
+        '\t\t.addColumn("name", "varchar(255)")',
+        "\t\t.execute()",
+        "}",
+      ].join("\n"),
+      "utf8",
+    )
+
+    const config = {
+      args: {} as never,
+      configMetadata: {},
+      cwd,
+      destroyOnExit: false,
+      dialect: "pg",
+      models: {
+        modelsFolder: join(cwd, "src/db/models"),
+        dbImportPath: "..",
+        source: "migrations",
+      },
+      typegen: {
+        source: "migrations",
+      },
+      migrations: {
+        getMigrationPrefix: () => "migration",
+        migrationFolder: migrationsFolder,
+      },
+      seeds: {
+        getSeedPrefix: () => "seed",
+        seedFolder: join(cwd, "seeds"),
+      },
+      kysely: createDatabase(),
+    } as ResolvedOrmfyConfig
+
+    await runModelsGen(config)
+
+    const content = await readFile(resolve(cwd, "src/db/models/customers.ts"), "utf8")
+
+    expect(content).toContain('\tguarded: [\n\t\t"id",\n\t] as const,')
+    expect(content).not.toContain('"created_at"')
+    expect(content).not.toContain('"updated_at"')
+  })
+
   test("infers string primary key strategy from migrations", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "ormfy-models-string-pk-"))
     const migrationsFolder = join(cwd, "migrations")
